@@ -6,78 +6,85 @@ namespace SOLID.Example
     {
         static void Main(string[] args)
         {
-            var hector = new Person("Hector");
-            var juan = new Person("Juan");
-            hector.Speak();
-            juan.Speak();
-            var database = new Database();
-            database.SaveToDatabase(hector);
-            var calculator = new SalaryCalculator();
-            var james = new Manager("James");
-            Console.WriteLine($"{james.Name} salary is {calculator.CalculateSalary(james)}");
-            var director = new Director("Richard");
-            Console.WriteLine($"{director.Name} salary is {calculator.CalculateSalary(director)}");
+            SaleWithTaxes sale = new LocalSale(100, "Hector", 0.16m);
+            sale.CalculateTaxes();
+            sale.Generate();
+
+            AbstractSale sale2 = new ForeignSale(200, "Pepe");
+            sale2.Generate();
+        }
+
+        public abstract class AbstractSale //T
+        {
+            protected decimal amount;
+            protected string? customer;
+            //protected decimal taxes;
+
+            public abstract void Generate();
+            //public abstract void CalculateTaxes(); 
+        }
+
+        public abstract class SaleWithTaxes : AbstractSale
+        {
+            protected decimal taxes;
+            public abstract void CalculateTaxes();
+        }
+
+        public class LocalSale : SaleWithTaxes{
+
+        public LocalSale(decimal amount, string customer, decimal taxes)
+        {
+            this.amount = amount;
+            this.customer = customer;
+            this.taxes = taxes;
+        }
+
+            public override void Generate()
+            {
+                Console.WriteLine("procesing sale");
+            }
+            public override void CalculateTaxes()
+            {
+                Console.WriteLine("calculating taxes");
+            }
+        }
+
+        public class SaleInvoice : SaleWithTaxes
+        {
+            public SaleInvoice(decimal amount, string customer, decimal taxes)
+            {
+                this.amount = amount;
+                this.customer = customer;
+                this.taxes = taxes;
+            }
+            public override void Generate()
+            {
+                Console.WriteLine("procesing sale");
+            }
+            public override void CalculateTaxes()
+            {
+                Console.WriteLine("calculating taxes");
+            }
+        }
+
+
+        public class ForeignSale : AbstractSale
+        { 
+
+        public ForeignSale(decimal amount, string customer)
+        {
+            this.amount = amount; 
+            this.customer = customer;
+        }
+
+            public override void Generate()
+            {
+                    Console.WriteLine("procesing sale");
+            }
         }
     }
 
-    public class Person
-    {
-        public virtual decimal DailyRate => 0;
-        public Person(string name)
-        {
-            Name = name;
-        }
-        public int Id { get; set;}
-        public string Name { get; set; }
 
-        public void Speak()
-        {
-            Console.WriteLine($"My name is {Name}");
-        }
-    }
-
-    public class Employee : Person
-    {
-        public override decimal DailyRate => 100;
-        public Employee(string name) : base(name)
-        {
-
-        }
-    }
-
-    public class Manager : Person
-    {
-        public override decimal DailyRate => 200;
-        public Manager(string name) : base(name)
-        {
-        }
-    }
-
-
-    public class Director : Person
-    {
-        public override decimal DailyRate => 300;
-        public Director(string name) : base(name)
-        {
-        }
-    }
-
-    public class SalaryCalculator
-    {
-        public decimal CalculateSalary(Person person)
-        {
-            return person.DailyRate * 356;
-        }
-    }
-
-
-    public class Database
-    {
-        public void SaveToDatabase(Person person)
-        {
-            Console.WriteLine($"Added {person.Name}");
-        }
-    }
 }
 
 
